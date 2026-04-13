@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: omi-backend
+
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: jdbc:oracle:thin:@${ADB_TNS_ALIAS}?TNS_ADMIN=${TNS_ADMIN}
+    username: ${ADB_APP_USER}
+    password: ${ADB_APP_PASSWORD}
+
+  flyway:
+    enabled: false
+
+app:
+  cors:
+    allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}

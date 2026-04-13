@@ -1,0 +1,12 @@
+# environment variables
+.env
+
+# Maven build output
+target/
+
+# Eclipse IDE metadata
+.settings/
+.classpath
+.project
+.factorypath
+.springBeans

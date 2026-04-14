@@ -7,12 +7,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException e) {
+  public ResponseEntity<Map<String, String>> handleValidation(MethodArgumentNotValidException e) {
     String message =
         e.getBindingResult().getFieldErrors().stream()
             .findFirst()
@@ -24,11 +26,12 @@ public class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Map<String, Object>> handleDataIntegrity(
+  public ResponseEntity<Map<String, String>> handleDataIntegrity(
       DataIntegrityViolationException e) {
-    String message = "Database constraint violation";
 
+    String message = "Database constraint violation";
     Throwable root = e.getRootCause();
+
     if (root != null && root.getMessage() != null) {
       String rootMsg = root.getMessage();
 
@@ -45,12 +48,17 @@ public class GlobalExceptionHandler {
         .body(Map.of("error", "Bad Request", "message", message));
   }
 
+  @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
+  public ResponseEntity<Map<String, String>> handleNotFound(Exception e) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND)
+        .body(Map.of("error", "Not Found", "message", "Route does not exist"));
+  }
+
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<Map<String, Object>> handleOther(Exception e) {
+  public ResponseEntity<Map<String, String>> handleOther(Exception e) {
+    e.printStackTrace(); // useful while debugging
+
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(
-            Map.of(
-                "error", "Internal Server Error",
-                "message", "Unexpected server error"));
+        .body(Map.of("error", "Internal Server Error", "message", "Unexpected server error"));
   }
 }

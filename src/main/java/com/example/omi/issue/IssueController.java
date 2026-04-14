@@ -21,7 +21,7 @@ public class IssueController {
   }
 
   @PostMapping
-  public void create(@Valid @RequestBody CreateIssueRequest req) {
+  public void create(@PathVariable Long projectId, @Valid @RequestBody CreateIssueRequest req) {
     repo.create(req);
   }
 }

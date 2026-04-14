@@ -1,6 +1,5 @@
 package com.example.omi.issue;
 
-import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public record IssueDto(
@@ -11,10 +10,8 @@ public record IssueDto(
     String title,
     String description,
     String status,
-    String priority,
     String type,
     Long assigneeId,
-    LocalDate dueDate,
     OffsetDateTime createdAt,
     OffsetDateTime updatedAt,
     Integer estimatedHours,

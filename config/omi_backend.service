@@ -1,0 +1,17 @@
+[Unit]
+Description=OMI Spring Boot Backend
+After=network.target
+
+[Service]
+User=opc
+WorkingDirectory=/opt/omi_backend
+
+EnvironmentFile=/opt/omi_backend/.env
+
+ExecStart=/usr/bin/java -jar /opt/omi_backend/app.jar
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

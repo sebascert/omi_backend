@@ -121,40 +121,72 @@ public class IssueRepository {
   }
 
   public void patch(Long issueId, PatchIssueRequest r) {
-    String sql =
-        """
-        UPDATE issues
-        SET
-            title = COALESCE(?, title),
-            description = COALESCE(?, description),
-            type = COALESCE(?, type),
-            status = COALESCE(?, status),
-            estimated_hours = COALESCE(?, estimated_hours),
-            actual_hours = COALESCE(?, actual_hours),
-            feature_id = COALESCE(?, feature_id),
-            assigned_to = COALESCE(?, assigned_to),
-            is_visible = COALESCE(?, is_visible),
-            updated_at = SYSTIMESTAMP
-        WHERE id = ?
-        """;
+    StringBuilder sql = new StringBuilder("UPDATE issues SET ");
+    List<Object> args = new ArrayList<>();
+    boolean first = true;
 
-    Integer visibleValue = null;
-    if (r.getIsVisible() != null) {
-      visibleValue = r.getIsVisible() ? 1 : 0;
+    if (r.getTitle() != null) {
+      sql.append(first ? "" : ", ").append("title = ?");
+      args.add(r.getTitle());
+      first = false;
     }
 
-    jdbc.update(
-        sql,
-        r.getTitle(),
-        r.getDescription(),
-        normalizeIssueType(r.getType()),
-        normalizeIssueStatus(r.getStatus()),
-        r.getEstimatedHours(),
-        r.getActualHours(),
-        r.getFeatureId(),
-        r.getAssigneeId(),
-        visibleValue,
-        issueId);
+    if (r.getDescription() != null) {
+      sql.append(first ? "" : ", ").append("description = ?");
+      args.add(r.getDescription());
+      first = false;
+    }
+
+    if (r.getType() != null) {
+      sql.append(first ? "" : ", ").append("type = ?");
+      args.add(normalizeIssueType(r.getType()));
+      first = false;
+    }
+
+    if (r.getStatus() != null) {
+      sql.append(first ? "" : ", ").append("status = ?");
+      args.add(normalizeIssueStatus(r.getStatus()));
+      first = false;
+    }
+
+    if (r.getEstimatedHours() != null) {
+      sql.append(first ? "" : ", ").append("estimated_hours = ?");
+      args.add(r.getEstimatedHours());
+      first = false;
+    }
+
+    if (r.getActualHours() != null) {
+      sql.append(first ? "" : ", ").append("actual_hours = ?");
+      args.add(r.getActualHours());
+      first = false;
+    }
+
+    if (r.getFeatureId() != null) {
+      sql.append(first ? "" : ", ").append("feature_id = ?");
+      args.add(r.getFeatureId());
+      first = false;
+    }
+
+    if (r.getAssigneeId() != null) {
+      sql.append(first ? "" : ", ").append("assigned_to = ?");
+      args.add(r.getAssigneeId());
+      first = false;
+    }
+
+    if (r.getIsVisible() != null) {
+      sql.append(first ? "" : ", ").append("is_visible = ?");
+      args.add(r.getIsVisible() ? 1 : 0);
+      first = false;
+    }
+
+    if (first) {
+      throw new IllegalArgumentException("No fields provided for patch");
+    }
+
+    sql.append(", updated_at = SYSTIMESTAMP WHERE id = ?");
+    args.add(issueId);
+
+    jdbc.update(sql.toString(), args.toArray());
   }
 
   public List<TimeLogDto> findTimeLogsByIssue(Long issueId) {
@@ -282,5 +314,19 @@ public class IssueRepository {
       return null;
     }
     return type.trim().toUpperCase();
+  }
+
+  public boolean isFeatureInProject(Long featureId, Long projectId) {
+    String sql =
+        """
+        SELECT COUNT(*)
+        FROM feature f
+        JOIN sprint s ON s.id = f.sprint_id
+        WHERE f.id = ?
+          AND s.project_id = ?
+        """;
+
+    Integer count = jdbc.queryForObject(sql, Integer.class, featureId, projectId);
+    return count != null && count > 0;
   }
 }

@@ -24,10 +24,9 @@ public class ProjectRepository {
         SELECT
             u.id AS user_id,
             u.name,
-            r.name AS role_name
+            pm.role_in_project AS role_name
         FROM project_member pm
         JOIN users u ON u.id = pm.user_id
-        LEFT JOIN role r ON r.id = u.role_id
         WHERE pm.project_id = ?
         ORDER BY u.id
         """;

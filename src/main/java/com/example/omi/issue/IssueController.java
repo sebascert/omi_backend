@@ -41,6 +41,11 @@ public class IssueController {
 
   @PostMapping("/projects/{projectId}/issues")
   public void create(@PathVariable Long projectId, @Valid @RequestBody CreateIssueRequest req) {
+
+    if (!repo.isFeatureInProject(req.getFeatureId(), projectId)) {
+      throw new IllegalArgumentException("Feature does not belong to the given project");
+    }
+
     repo.create(req);
   }
 

@@ -15,6 +15,28 @@ public class ProjectRepository {
   }
 
   public List<Map<String, Object>> findAll() {
-    return jdbcTemplate.queryForList("SELECT * FROM project");
+    return jdbcTemplate.queryForList("SELECT * FROM project ORDER BY id");
+  }
+
+  public List<ProjectMemberDto> findMembers(Long projectId) {
+    String sql =
+        """
+        SELECT
+            u.id AS user_id,
+            u.name,
+            r.name AS role_name
+        FROM project_member pm
+        JOIN users u ON u.id = pm.user_id
+        LEFT JOIN role r ON r.id = u.role_id
+        WHERE pm.project_id = ?
+        ORDER BY u.id
+        """;
+
+    return jdbcTemplate.query(
+        sql,
+        (rs, rowNum) ->
+            new ProjectMemberDto(
+                rs.getLong("user_id"), rs.getString("name"), rs.getString("role_name")),
+        projectId);
   }
 }

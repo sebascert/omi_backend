@@ -18,4 +18,9 @@ public class ProjectController {
   public List<Map<String, Object>> getAll() {
     return repo.findAll();
   }
+
+  @GetMapping("/{projectId}/members")
+  public List<ProjectMemberDto> getMembers(@PathVariable Long projectId) {
+    return repo.findMembers(projectId);
+  }
 }

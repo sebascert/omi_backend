@@ -1,11 +1,12 @@
 package com.example.omi.issue;
 
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/projects/{projectId}/issues")
+@RequestMapping("/api")
 public class IssueController {
 
   private final IssueRepository repo;
@@ -14,14 +15,54 @@ public class IssueController {
     this.repo = repo;
   }
 
-  @GetMapping
+  @GetMapping("/projects/{projectId}/issues")
   public List<IssueDto> list(
-      @PathVariable Long projectId, @RequestParam(required = false) Long sprintId) {
-    return repo.findByProject(projectId, sprintId);
+      @PathVariable Long projectId,
+      @RequestParam(required = false) Long sprintId,
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) Long assignedTo,
+      @RequestParam(required = false) String dateRange) {
+
+    LocalDate startDate = null;
+    LocalDate endDate = null;
+
+    if (dateRange != null && !dateRange.isBlank()) {
+      String[] parts = dateRange.split(",");
+      if (parts.length == 2) {
+        startDate = LocalDate.parse(parts[0].trim());
+        endDate = LocalDate.parse(parts[1].trim());
+      } else {
+        throw new IllegalArgumentException("dateRange must have format yyyy-MM-dd,yyyy-MM-dd");
+      }
+    }
+
+    return repo.findByProject(projectId, sprintId, status, assignedTo, startDate, endDate);
   }
 
-  @PostMapping
+  @PostMapping("/projects/{projectId}/issues")
   public void create(@PathVariable Long projectId, @Valid @RequestBody CreateIssueRequest req) {
     repo.create(req);
+  }
+
+  @PatchMapping("/issues/{issueId}")
+  public void patch(@PathVariable Long issueId, @Valid @RequestBody PatchIssueRequest req) {
+    repo.patch(issueId, req);
+  }
+
+  @GetMapping("/issues/{issueId}/timelogs")
+  public List<TimeLogDto> getIssueTimeLogs(@PathVariable Long issueId) {
+    return repo.findTimeLogsByIssue(issueId);
+  }
+
+  @PostMapping("/issues/{issueId}/timelogs")
+  public void createIssueTimeLog(
+      @PathVariable Long issueId, @Valid @RequestBody CreateTimeLogRequest req) {
+    repo.createTimeLog(issueId, req);
+  }
+
+  @GetMapping("/projects/{projectId}/timelogs")
+  public List<TimeLogDto> getProjectTimeLogs(
+      @PathVariable Long projectId, @RequestParam(required = false) Long sprintId) {
+    return repo.findTimeLogsByProject(projectId, sprintId);
   }
 }

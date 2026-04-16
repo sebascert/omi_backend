@@ -43,15 +43,20 @@ public class KpiRepository {
         """
             + sprintFilter;
 
-    return jdbc.queryForObject(
-        sql,
-        (rs, rowNum) ->
-            new KpiSummaryDto(
-                rs.getInt("total_tasks"),
-                rs.getBigDecimal("total_actual_hours"),
-                rs.getBigDecimal("avg_tasks_per_dev"),
-                rs.getBigDecimal("avg_hours_per_dev")),
-        args.toArray());
+    try {
+      return jdbc.queryForObject(
+          sql,
+          (rs, rowNum) ->
+              new KpiSummaryDto(
+                  rs.getInt("total_tasks"),
+                  rs.getBigDecimal("total_actual_hours"),
+                  rs.getBigDecimal("avg_tasks_per_dev"),
+                  rs.getBigDecimal("avg_hours_per_dev")),
+          args.toArray());
+    } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+      return new KpiSummaryDto(
+          0, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO, java.math.BigDecimal.ZERO);
+    }
   }
 
   public List<TasksByUserDto> getTasksByUser(Long projectId, Long sprintId) {

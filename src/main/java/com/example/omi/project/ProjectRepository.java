@@ -38,4 +38,41 @@ public class ProjectRepository {
                 rs.getLong("user_id"), rs.getString("name"), rs.getString("role_name")),
         projectId);
   }
+
+  public void addMember(Long projectId, CreateProjectMemberRequest req) {
+    String sql =
+        """
+        INSERT INTO project_member (
+            id,
+            project_id,
+            user_id,
+            role_in_project,
+            joined_at
+        ) VALUES (
+            (SELECT COALESCE(MAX(id), 0) + 1 FROM project_member),
+            ?, ?, ?, SYSTIMESTAMP
+        )
+        """;
+
+    jdbcTemplate.update(sql, projectId, req.getUserId(), req.getRole());
+  }
+
+  public boolean userExists(Long userId) {
+    String sql = "SELECT COUNT(*) FROM users WHERE id = ?";
+    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, userId);
+    return count != null && count > 0;
+  }
+
+  public boolean memberExists(Long projectId, Long userId) {
+    String sql =
+        """
+        SELECT COUNT(*)
+        FROM project_member
+        WHERE project_id = ?
+          AND user_id = ?
+        """;
+
+    Integer count = jdbcTemplate.queryForObject(sql, Integer.class, projectId, userId);
+    return count != null && count > 0;
+  }
 }

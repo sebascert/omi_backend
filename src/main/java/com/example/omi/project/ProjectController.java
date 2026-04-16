@@ -1,5 +1,6 @@
 package com.example.omi.project;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import org.springframework.web.bind.annotation.*;
@@ -22,5 +23,21 @@ public class ProjectController {
   @GetMapping("/{projectId}/members")
   public List<ProjectMemberDto> getMembers(@PathVariable Long projectId) {
     return repo.findMembers(projectId);
+  }
+
+  @PostMapping("/{projectId}/member")
+  public void addMember(
+      @PathVariable Long projectId, @Valid @RequestBody CreateProjectMemberRequest req) {
+
+    if (!repo.userExists(req.getUserId())) {
+      throw new IllegalArgumentException(
+          "Cannot add member: User " + req.getUserId() + " not found");
+    }
+
+    if (repo.memberExists(projectId, req.getUserId())) {
+      throw new IllegalArgumentException("User is already in this project");
+    }
+
+    repo.addMember(projectId, req);
   }
 }

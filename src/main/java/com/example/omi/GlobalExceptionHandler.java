@@ -1,14 +1,11 @@
 package com.example.omi;
 
 import java.util.Map;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -22,43 +19,39 @@ public class GlobalExceptionHandler {
             .orElse("Invalid request body");
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(Map.of("error", "Bad Request", "message", message));
+        .body(Map.of("error", "Validation Failed", "message", message));
   }
 
-  @ExceptionHandler(DataIntegrityViolationException.class)
-  public ResponseEntity<Map<String, String>> handleDataIntegrity(
-      DataIntegrityViolationException e) {
-
-    String message = "Database constraint violation";
-    Throwable root = e.getRootCause();
-
-    if (root != null && root.getMessage() != null) {
-      String rootMsg = root.getMessage();
-
-      if (rootMsg.contains("ORA-02290")) {
-        message = "Invalid value for one or more fields";
-      } else if (rootMsg.contains("ORA-00001")) {
-        message = "A unique value already exists";
-      } else if (rootMsg.contains("ORA-02291") || rootMsg.contains("ORA-02292")) {
-        message = "Referenced record does not exist or is still in use";
-      }
-    }
-
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
     return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-        .body(Map.of("error", "Bad Request", "message", message));
+        .body(Map.of("error", "Invalid Argument", "message", e.getMessage()));
   }
 
-  @ExceptionHandler({NoHandlerFoundException.class, NoResourceFoundException.class})
-  public ResponseEntity<Map<String, String>> handleNotFound(Exception e) {
+  @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+  public ResponseEntity<Map<String, String>> handleDataIntegrity(Exception e) {
+    return ResponseEntity.status(HttpStatus.CONFLICT)
+        .body(
+            Map.of(
+                "error",
+                "Database Conflict",
+                "message",
+                "The operation could not be completed due to data constraints."));
+  }
+
+  @ExceptionHandler(org.springframework.dao.EmptyResultDataAccessException.class)
+  public ResponseEntity<Map<String, String>> handleNotFoundData(
+      org.springframework.dao.EmptyResultDataAccessException e) {
     return ResponseEntity.status(HttpStatus.NOT_FOUND)
-        .body(Map.of("error", "Not Found", "message", "Route does not exist"));
+        .body(
+            Map.of(
+                "error", "Not Found",
+                "message", "The requested resource does not exist"));
   }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, String>> handleOther(Exception e) {
-    e.printStackTrace(); // useful while debugging
-
     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(Map.of("error", "Internal Server Error", "message", "Unexpected server error"));
+        .body(Map.of("error", "Internal Server Error", "message", "An unexpected error occurred."));
   }
 }

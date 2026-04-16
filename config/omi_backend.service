@@ -7,6 +7,7 @@ User=opc
 WorkingDirectory=/opt/omi_backend
 
 EnvironmentFile=/opt/omi_backend/.env
+Environment="TNS_ADMIN=/opt/omi_backend/wallet"
 
 ExecStart=/usr/bin/java -jar /opt/omi_backend/app.jar
 

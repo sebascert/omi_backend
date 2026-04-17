@@ -18,7 +18,7 @@ public class CorsConfig {
       public void addCorsMappings(CorsRegistry registry) {
         registry
             .addMapping("/api/**")
-            .allowedOrigins(allowedOrigin)
+            .allowedOrigins(allowedOrigin.split(","))
             .allowedMethods("*")
             .allowedHeaders("*");
       }

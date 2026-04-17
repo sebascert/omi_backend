@@ -23,4 +23,4 @@ spring:
 
 app:
   cors:
-    allowed-origin: ${FRONTEND_ORIGIN:http://localhost:5173}
+    allowed-origin: ${FRONTEND_ORIGIN}

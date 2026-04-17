@@ -125,6 +125,24 @@ request GET "$BASE_URL/projects/$PROJECT_ID/kpis/summary?sprintId=$SPRINT_ID"
 request GET "$BASE_URL/projects/$PROJECT_ID/kpis/hours-by-user"
 request GET "$BASE_URL/projects/$PROJECT_ID/kpis/hours-by-user?sprintId=$SPRINT_ID"
 
+echo "===== USERS ====="
+request GET "$BASE_URL/users"
+
+request POST "$BASE_URL/users" '{
+  "name": "User Three",
+  "email": "user3@mail.com",
+  "passwordHash": "testhash",
+  "workMode": "remote",
+  "roleId": 1,
+  "managerId": 102,
+  "status": "active"
+}'
+
+request GET "$BASE_URL/users"
+
+request DELETE "$BASE_URL/users/103"
+request GET "$BASE_URL/users"
+
 echo "===== ISSUE DELETE ====="
 request DELETE "$BASE_URL/issues/$ISSUE_ID"
 request GET "$BASE_URL/projects/$PROJECT_ID/issues"

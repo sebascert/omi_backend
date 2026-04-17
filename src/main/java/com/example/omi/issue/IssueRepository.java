@@ -329,4 +329,15 @@ public class IssueRepository {
     Integer count = jdbc.queryForObject(sql, Integer.class, featureId, projectId);
     return count != null && count > 0;
   }
+
+  public void delete(Long issueId) {
+    jdbc.update("DELETE FROM timelog WHERE issue_id = ?", issueId);
+    jdbc.update("DELETE FROM issue_log WHERE issue_id = ?", issueId);
+
+    int rows = jdbc.update("DELETE FROM issues WHERE id = ?", issueId);
+
+    if (rows == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+  }
 }

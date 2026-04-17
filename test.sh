@@ -125,6 +125,10 @@ request GET "$BASE_URL/projects/$PROJECT_ID/kpis/summary?sprintId=$SPRINT_ID"
 request GET "$BASE_URL/projects/$PROJECT_ID/kpis/hours-by-user"
 request GET "$BASE_URL/projects/$PROJECT_ID/kpis/hours-by-user?sprintId=$SPRINT_ID"
 
+echo "===== ISSUE DELETE ====="
+request DELETE "$BASE_URL/issues/$ISSUE_ID"
+request GET "$BASE_URL/projects/$PROJECT_ID/issues"
+
 echo "===== NEGATIVE TESTING (ERROR HANDLING) ====="
 
 echo "1. Testing 404 for non-existent endpoint:"

@@ -70,4 +70,9 @@ public class IssueController {
       @PathVariable Long projectId, @RequestParam(required = false) Long sprintId) {
     return repo.findTimeLogsByProject(projectId, sprintId);
   }
+
+  @DeleteMapping("/issues/{issueId}")
+  public void delete(@PathVariable Long issueId) {
+    repo.delete(issueId);
+  }
 }

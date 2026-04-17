@@ -8,7 +8,7 @@ import org.springframework.web.servlet.config.annotation.*;
 @Configuration
 public class CorsConfig {
 
-  @Value("${app.cors.allowed-origin:http://localhost:5173}")
+  @Value("${app.cors.allowed-origin}")
   private String allowedOrigin;
 
   @Bean

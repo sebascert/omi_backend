@@ -19,6 +19,7 @@ public class SprintRepository {
             SELECT id, name, start_date, end_date, status, project_id
             FROM sprint
             WHERE project_id = ?
+            ORDER BY id
         """;
 
     return jdbcTemplate.query(
@@ -31,6 +32,33 @@ public class SprintRepository {
                 rs.getDate("end_date").toLocalDate(),
                 rs.getString("status"),
                 rs.getLong("project_id")),
+        projectId);
+  }
+
+  public void create(Long projectId, CreateSprintRequest req) {
+    String sql =
+        """
+        INSERT INTO sprint (
+            id,
+            name,
+            start_date,
+            end_date,
+            goal,
+            status,
+            project_id
+        ) VALUES (
+            (SELECT COALESCE(MAX(id), 0) + 1 FROM sprint),
+            ?, ?, ?, ?, ?, ?
+        )
+        """;
+
+    jdbcTemplate.update(
+        sql,
+        req.getName(),
+        java.sql.Date.valueOf(req.getStartDate()),
+        java.sql.Date.valueOf(req.getEndDate()),
+        req.getGoal(),
+        req.getStatus(),
         projectId);
   }
 }

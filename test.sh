@@ -55,6 +55,16 @@ request POST "$BASE_URL/projects/$PROJECT_ID/member" "{
 }"
 
 request GET "$BASE_URL/projects/$PROJECT_ID/members"
+
+request POST "$BASE_URL/projects/$PROJECT_ID/sprints" '{
+  "name": "Sprint created by test script",
+  "startDate": "2026-04-20",
+  "endDate": "2026-05-03",
+  "goal": "Testing POST /api/projects/{projectId}/sprints",
+  "status": "active"
+}'
+request GET "$BASE_URL/projects/$PROJECT_ID/sprints"
+
 request GET "$BASE_URL/projects/$PROJECT_ID/sprints"
 
 echo "===== MEMBER DELETE ====="

@@ -57,6 +57,10 @@ request POST "$BASE_URL/projects/$PROJECT_ID/member" "{
 request GET "$BASE_URL/projects/$PROJECT_ID/members"
 request GET "$BASE_URL/projects/$PROJECT_ID/sprints"
 
+echo "===== MEMBER DELETE ====="
+request DELETE "$BASE_URL/projects/$PROJECT_ID/members/$USER_ID"
+request GET "$BASE_URL/projects/$PROJECT_ID/members"
+
 echo "===== FEATURES ====="
 request GET "$BASE_URL/sprints/$SPRINT_ID/features"
 

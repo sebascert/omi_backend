@@ -40,4 +40,14 @@ public class ProjectController {
 
     repo.addMember(projectId, req);
   }
+
+  @DeleteMapping("/{projectId}/members/{userId}")
+  public void deleteMember(@PathVariable Long projectId, @PathVariable Long userId) {
+
+    if (!repo.memberExists(projectId, userId)) {
+      throw new IllegalArgumentException("User is not a member of this project");
+    }
+
+    repo.deleteMember(projectId, userId);
+  }
 }

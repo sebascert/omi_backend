@@ -75,4 +75,19 @@ public class ProjectRepository {
     Integer count = jdbcTemplate.queryForObject(sql, Integer.class, projectId, userId);
     return count != null && count > 0;
   }
+
+  public void deleteMember(Long projectId, Long userId) {
+    String sql =
+        """
+        DELETE FROM project_member
+        WHERE project_id = ?
+          AND user_id = ?
+        """;
+
+    int rows = jdbcTemplate.update(sql, projectId, userId);
+
+    if (rows == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+  }
 }

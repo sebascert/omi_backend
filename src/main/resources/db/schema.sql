@@ -1,5 +1,5 @@
 -- =====================================
--- CLEAN START (optional)
+-- CLEAN START
 -- =====================================
 
 BEGIN EXECUTE IMMEDIATE 'DROP TABLE issue_log CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
@@ -214,40 +214,3 @@ BEGIN
     END IF;
 END;
 /
-
--- =====================================
--- MINIMAL DATA
--- =====================================
-
-INSERT INTO role VALUES (1, 'DEV');
-
-INSERT INTO users (id, name, email, role_id)
-VALUES (101, 'User One', 'user1@mail.com', 1);
-
-INSERT INTO users (id, name, email, role_id)
-VALUES (102, 'User Two', 'user2@mail.com', 1);
-
-INSERT INTO project VALUES (1, 'Demo Project', 'Test', SYSTIMESTAMP, 'active');
-
-INSERT INTO sprint VALUES (1, 'Sprint 1', SYSDATE, SYSDATE+7, 'Goal', 'active', 1);
-
-INSERT INTO feature VALUES (1, 'Login Feature', 'desc', 1, 'high', 'open');
-
--- =====================================
--- DEMO
--- =====================================
-
-INSERT INTO issues (id, title, status, estimated_hours, assigned_to, feature_id)
-VALUES (1, 'Fix login bug', 'open', 5, 101, 1);
-
-UPDATE issues SET status = 'in_progress' WHERE id = 1;
-
-UPDATE issues SET assigned_to = 102 WHERE id = 1;
-
-UPDATE issues SET actual_hours = 6 WHERE id = 1;
-
--- =====================================
--- CHECK RESULTS
--- =====================================
-
-SELECT * FROM issue_log;

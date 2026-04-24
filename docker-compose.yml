@@ -1,0 +1,13 @@
+services:
+  omi-backend:
+    build: .
+    container_name: omi-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - ./config/.env
+    environment:
+      TNS_ADMIN: /app/wallet
+    volumes:
+      - ./config/wallet:/app/wallet:ro
+    restart: unless-stopped

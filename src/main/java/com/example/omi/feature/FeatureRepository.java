@@ -54,4 +54,45 @@ public class FeatureRepository {
                 rs.getString("status")),
         sprintId);
   }
+
+  public void delete(Long sprintId, Long featureId) {
+
+    Integer count =
+        jdbc.queryForObject(
+            "SELECT COUNT(*) FROM feature WHERE id = ? AND sprint_id = ?",
+            Integer.class,
+            featureId,
+            sprintId);
+
+    if (count == null || count == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+
+    jdbc.update(
+        """
+        DELETE FROM timelog
+        WHERE issue_id IN (
+            SELECT id FROM issues WHERE feature_id = ?
+        )
+        """,
+        featureId);
+
+    jdbc.update(
+        """
+        DELETE FROM issue_log
+        WHERE issue_id IN (
+            SELECT id FROM issues WHERE feature_id = ?
+        )
+        """,
+        featureId);
+
+    jdbc.update("DELETE FROM issues WHERE feature_id = ?", featureId);
+
+    int rows =
+        jdbc.update("DELETE FROM feature WHERE id = ? AND sprint_id = ?", featureId, sprintId);
+
+    if (rows == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+  }
 }

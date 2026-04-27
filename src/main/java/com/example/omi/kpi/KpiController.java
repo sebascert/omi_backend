@@ -25,9 +25,15 @@ public class KpiController {
     return repo.getTasksByUser(projectId, sprintId);
   }
 
-  @GetMapping("/hours-by-user")
-  public List<HoursByUserDto> hoursByUser(
+  @GetMapping("/real-hours-by-user")
+  public List<HoursByUserDto> realHoursByUser(
       @PathVariable Long projectId, @RequestParam(required = false) Long sprintId) {
-    return repo.getHoursByUser(projectId, sprintId);
+    return repo.getRealHoursByUser(projectId, sprintId);
+  }
+
+  @GetMapping("/estimated-hours-by-user")
+  public List<HoursByUserDto> estimatedHoursByUser(
+      @PathVariable Long projectId, @RequestParam(required = false) Long sprintId) {
+    return repo.getEstimatedHoursByUser(projectId, sprintId);
   }
 }

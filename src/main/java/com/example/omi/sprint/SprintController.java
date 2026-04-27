@@ -2,6 +2,7 @@ package com.example.omi.sprint;
 
 import jakarta.validation.Valid;
 import java.util.List;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,5 +27,12 @@ public class SprintController {
     }
 
     repo.create(projectId, req);
+  }
+
+  @DeleteMapping("/{sprintId}")
+  public ResponseEntity<Void> delete(@PathVariable Long projectId, @PathVariable Long sprintId) {
+
+    repo.delete(projectId, sprintId);
+    return ResponseEntity.noContent().build();
   }
 }

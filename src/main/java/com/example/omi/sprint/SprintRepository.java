@@ -61,4 +61,60 @@ public class SprintRepository {
         req.getStatus(),
         projectId);
   }
+
+  public void delete(Long projectId, Long sprintId) {
+    Integer count =
+        jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM sprint WHERE id = ? AND project_id = ?",
+            Integer.class,
+            sprintId,
+            projectId);
+
+    if (count == null || count == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+
+    jdbcTemplate.update(
+        """
+        DELETE FROM timelog
+        WHERE issue_id IN (
+            SELECT i.id
+            FROM issues i
+            JOIN feature f ON f.id = i.feature_id
+            WHERE f.sprint_id = ?
+        )
+        """,
+        sprintId);
+
+    jdbcTemplate.update(
+        """
+        DELETE FROM issue_log
+        WHERE issue_id IN (
+            SELECT i.id
+            FROM issues i
+            JOIN feature f ON f.id = i.feature_id
+            WHERE f.sprint_id = ?
+        )
+        """,
+        sprintId);
+
+    jdbcTemplate.update(
+        """
+        DELETE FROM issues
+        WHERE feature_id IN (
+            SELECT id FROM feature WHERE sprint_id = ?
+        )
+        """,
+        sprintId);
+
+    jdbcTemplate.update("DELETE FROM feature WHERE sprint_id = ?", sprintId);
+
+    int rows =
+        jdbcTemplate.update(
+            "DELETE FROM sprint WHERE id = ? AND project_id = ?", sprintId, projectId);
+
+    if (rows == 0) {
+      throw new org.springframework.dao.EmptyResultDataAccessException(1);
+    }
+  }
 }

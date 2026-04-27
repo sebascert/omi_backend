@@ -63,6 +63,7 @@ public class KpiRepository {
         new StringBuilder(
             """
             SELECT
+                u.id AS user_id,
                 u.name AS user_name,
                 COUNT(i.id) AS tasks_completed
             FROM issues i
@@ -81,11 +82,13 @@ public class KpiRepository {
       args.add(sprintId);
     }
 
-    sql.append(" GROUP BY u.name ORDER BY u.name");
+    sql.append(" GROUP BY u.id, u.name ORDER BY u.name");
 
     return jdbc.query(
         sql.toString(),
-        (rs, rowNum) -> new TasksByUserDto(rs.getString("user_name"), rs.getInt("tasks_completed")),
+        (rs, rowNum) ->
+            new TasksByUserDto(
+                rs.getLong("user_id"), rs.getString("user_name"), rs.getInt("tasks_completed")),
         args.toArray());
   }
 
@@ -94,6 +97,7 @@ public class KpiRepository {
         new StringBuilder(
             """
             SELECT
+                u.id AS user_id,
                 u.name AS user_name,
                 COALESCE(SUM(i.actual_hours), 0) AS hours
             FROM issues i
@@ -111,11 +115,13 @@ public class KpiRepository {
       args.add(sprintId);
     }
 
-    sql.append(" GROUP BY u.name ORDER BY u.name");
+    sql.append(" GROUP BY u.id, u.name ORDER BY u.name");
 
     return jdbc.query(
         sql.toString(),
-        (rs, rowNum) -> new HoursByUserDto(rs.getString("user_name"), rs.getBigDecimal("hours")),
+        (rs, rowNum) ->
+            new HoursByUserDto(
+                rs.getLong("user_id"), rs.getString("user_name"), rs.getBigDecimal("hours")),
         args.toArray());
   }
 
@@ -124,6 +130,7 @@ public class KpiRepository {
         new StringBuilder(
             """
             SELECT
+                u.id AS user_id,
                 u.name AS user_name,
                 COALESCE(SUM(i.estimated_hours), 0) AS hours
             FROM issues i
@@ -141,11 +148,13 @@ public class KpiRepository {
       args.add(sprintId);
     }
 
-    sql.append(" GROUP BY u.name ORDER BY u.name");
+    sql.append(" GROUP BY u.id, u.name ORDER BY u.name");
 
     return jdbc.query(
         sql.toString(),
-        (rs, rowNum) -> new HoursByUserDto(rs.getString("user_name"), rs.getBigDecimal("hours")),
+        (rs, rowNum) ->
+            new HoursByUserDto(
+                rs.getLong("user_id"), rs.getString("user_name"), rs.getBigDecimal("hours")),
         args.toArray());
   }
 }

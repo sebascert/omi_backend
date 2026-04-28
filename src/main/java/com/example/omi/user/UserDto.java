@@ -10,4 +10,5 @@ public record UserDto(
     Long roleId,
     Long managerId,
     OffsetDateTime createdAt,
-    String status) {}
+    String status,
+    String chatId) {}

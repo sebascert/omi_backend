@@ -2,6 +2,8 @@
 -- CLEAN START
 -- =====================================
 
+BEGIN EXECUTE IMMEDIATE 'DROP TABLE overdue_report CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
 BEGIN EXECUTE IMMEDIATE 'DROP TABLE issue_log CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
 /
 BEGIN EXECUTE IMMEDIATE 'DROP TABLE timelog CASCADE CONSTRAINTS'; EXCEPTION WHEN OTHERS THEN NULL; END;
@@ -46,6 +48,7 @@ CREATE TABLE users (
     manager_id NUMBER,
     created_at TIMESTAMP DEFAULT SYSTIMESTAMP,
     status VARCHAR2(20),
+    chat_id VARCHAR2(100),
 
     CONSTRAINT fk_user_role FOREIGN KEY (role_id) REFERENCES role(id),
     CONSTRAINT fk_user_manager FOREIGN KEY (manager_id) REFERENCES users(id)
@@ -105,6 +108,7 @@ CREATE TABLE issues (
     is_visible NUMBER(1) DEFAULT 1,
     created_at TIMESTAMP DEFAULT SYSTIMESTAMP,
     updated_at TIMESTAMP,
+    due_date DATE,
 
     CONSTRAINT fk_issue_feature FOREIGN KEY (feature_id) REFERENCES feature(id),
     CONSTRAINT fk_issue_user FOREIGN KEY (assigned_to) REFERENCES users(id)
@@ -165,6 +169,16 @@ CREATE TABLE issue_log (
 
     CONSTRAINT fk_log_issue FOREIGN KEY (issue_id) REFERENCES issues(id),
     CONSTRAINT fk_log_user FOREIGN KEY (changed_by) REFERENCES users(id)
+);
+
+CREATE TABLE overdue_report (
+    id NUMBER PRIMARY KEY,
+    issue_id NUMBER,
+    generated_at TIMESTAMP DEFAULT SYSTIMESTAMP,
+    title VARCHAR2(200),
+    notes VARCHAR2(500),
+
+    CONSTRAINT fk_overdue_issue FOREIGN KEY (issue_id) REFERENCES issues(id)
 );
 
 -- =====================================

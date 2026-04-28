@@ -1,5 +1,6 @@
 package com.example.omi.issue;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 public record IssueDto(
@@ -16,4 +17,5 @@ public record IssueDto(
     OffsetDateTime updatedAt,
     Integer estimatedHours,
     Integer actualHours,
-    Boolean isVisible) {}
+    Boolean isVisible,
+    LocalDate dueDate) {}

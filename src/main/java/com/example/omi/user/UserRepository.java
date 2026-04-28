@@ -27,7 +27,8 @@ public class UserRepository {
             role_id,
             manager_id,
             created_at,
-            status
+            status,
+            chat_id
         FROM users
         ORDER BY id
         """;
@@ -100,6 +101,7 @@ public class UserRepository {
         rs.getObject("role_id", Long.class),
         rs.getObject("manager_id", Long.class),
         rs.getObject("created_at", OffsetDateTime.class),
-        rs.getString("status"));
+        rs.getString("status"),
+        rs.getString("chat_id"));
   }
 }

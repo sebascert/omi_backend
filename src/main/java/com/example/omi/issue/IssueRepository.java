@@ -45,7 +45,8 @@ public class IssueRepository {
                 i.updated_at,
                 i.estimated_hours,
                 i.actual_hours,
-                i.is_visible
+                i.is_visible,
+                i.due_date
             FROM issues i
             JOIN feature f ON f.id = i.feature_id
             JOIN sprint s ON s.id = f.sprint_id
@@ -267,6 +268,8 @@ public class IssueRepository {
   }
 
   private IssueDto mapIssueDto(ResultSet rs, int rowNum) throws SQLException {
+    java.sql.Date dueDate = rs.getDate("due_date");
+
     return new IssueDto(
         rs.getLong("id"),
         rs.getLong("project_id"),
@@ -281,7 +284,8 @@ public class IssueRepository {
         rs.getObject("updated_at", OffsetDateTime.class),
         rs.getObject("estimated_hours", Integer.class),
         rs.getObject("actual_hours", Integer.class),
-        rs.getInt("is_visible") == 1);
+        rs.getInt("is_visible") == 1,
+        dueDate != null ? dueDate.toLocalDate() : null);
   }
 
   private TimeLogDto mapTimeLogDto(ResultSet rs, int rowNum) throws SQLException {

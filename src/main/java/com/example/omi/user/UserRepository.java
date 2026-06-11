@@ -4,6 +4,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -23,6 +25,7 @@ public class UserRepository {
             id,
             name,
             email,
+            password_hash,
             work_mode,
             role_id,
             manager_id,
@@ -97,11 +100,77 @@ public class UserRepository {
         rs.getLong("id"),
         rs.getString("name"),
         rs.getString("email"),
+        rs.getString("password_hash"),
         rs.getString("work_mode"),
         rs.getObject("role_id", Long.class),
         rs.getObject("manager_id", Long.class),
         rs.getObject("created_at", OffsetDateTime.class),
         rs.getString("status"),
         rs.getString("chat_id"));
+  }
+
+  public Optional<UserDto> findByEmail(String email) {
+    String sql =
+        """
+        SELECT
+            id,
+            name,
+            email,
+            password_hash,
+            work_mode,
+            role_id,
+            manager_id,
+            created_at,
+            status,
+            chat_id
+        FROM users
+        WHERE email = ?
+        """;
+
+    return jdbc.query(sql, this::mapUserDto, email)
+              .stream()
+              .findFirst();
+  }
+
+  public void createFromSignup(
+          String name,
+          String email,
+          String passwordHash,
+          String workMode,
+          Long roleId,
+          Long managerId,
+          String status,
+          String chatId) {
+
+      String sql =
+          """
+          INSERT INTO users (
+              id,
+              name,
+              email,
+              password_hash,
+              work_mode,
+              role_id,
+              manager_id,
+              created_at,
+              status,
+              chat_id
+          ) VALUES (
+              (SELECT COALESCE(MAX(id),0)+1 FROM users),
+              ?, ?, ?, ?, ?, ?, SYSTIMESTAMP, ?, ?
+          )
+          """;
+
+      jdbc.update(
+          sql,
+          name,
+          email,
+          passwordHash,
+          workMode,
+          roleId,
+          managerId,
+          status,
+          chatId
+      );
   }
 }
